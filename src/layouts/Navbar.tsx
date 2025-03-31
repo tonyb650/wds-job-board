@@ -1,69 +1,71 @@
-import { MoonIcon, MoreHorizontal, SunIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { TASK_CATEGORIES, TASK_PRIORITIES, TASK_STATUSES } from "@/features/task-list/constants/constants"
+import { THEME_OPTIONS } from "@/constants/constants"
+import useTheme from "@/hooks/useTheme"
+import { Moon, Sun } from "lucide-react"
+import { Link } from "react-router"
 
 const Navbar = () => {
   return (
     <nav className="flex items-center justify-between border-b-2 py-5 px-10">
       <a href="#" className="text-xl">WDS App</a>
-      <ul className="flex items-center space-x-4">
-        <SelectTheme/>
-        <li>Task Board</li>
-      </ul>
+      <div className="flex items-center space-x-8">
+        <ThemeToggleButton/>
+
+        <Button variant={"ghost"}>
+          <Link to="/tasks">
+            Task Board
+          </Link>
+        </Button>
+
+        <Button variant={"ghost"}>
+          <Link to="/jobs">
+            Job Listings
+          </Link>
+        </Button>
+
+        <Button variant={"ghost"}>
+          <Link to="/user">
+            User
+          </Link>
+        </Button>
+
+        </div>
     </nav>
   )
 }
 
 export default Navbar
 
-const themes = ["Light", "Dark", "System"]
 
-function SelectTheme() {
 
-  const handleThemeChange = (theme: string) => {
-    switch (theme) {
-      case "Light":
-        document.documentElement.classList.remove("dark")
-        break
-      case "Dark":
-        document.documentElement.classList.add("dark")
-        break
-      case "System":
-        document.documentElement.classList.toggle("dark")
-        break
-      default:
-        break
-    }
-  }
 
+/* Resources for this component
+  About RadixUI 'Slot' & 'asChild': https://www.youtube.com/watch?v=r0I-pzcE8dg
+  About 'cva' (component variants): https://www.youtube.com/watch?v=qGQRdCg6JRQ (Brooks Lybrand)
+*/
+const ThemeToggleButton = () => {
+  
+  const {setTheme} = useTheme()
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="">
           <span className="sr-only">Open theme menu</span>
-          <SunIcon className="" />
+          {/* 'transition-transform' seems to zoom in and out for the Sun & Moon icons */}
+          <Sun className="h-5 w-5 scale-100 dark:scale-0 transition-transform" />
+          <Moon className="absolute h-5 w-5 scale-0 dark:scale-100 transition-transform" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {themes.map((theme) => (
-          <DropdownMenuItem key={theme} onClick={() => handleThemeChange(theme)}>
+        {THEME_OPTIONS.map((theme) => (
+          <DropdownMenuItem key={theme} onClick={() => setTheme(theme)}>
             {theme}
           </DropdownMenuItem>
         ))}

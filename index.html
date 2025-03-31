@@ -6,10 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Board</title>
     <script>
-      const theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      /* 
+        - Get theme from localStorage
+        - If there is no theme in localStorage, then theme = null, otherwise theme == 'light' | 'dark' | 'system'
+        - If it is 'system' && user pref is 'dark', then theme = 'dark'
+        - If it is 'system' && user pref is not 'dark', then theme = 'light' 
+      */
+      let theme = JSON.parse(localStorage.getItem('theme'))
+      if (theme === 'system'){
+        theme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light"
-
+      } 
+      // At this point, theme == 'light' | 'dark' | null
       document.documentElement.classList.toggle("dark", theme === "dark")
     </script>
   </head>
