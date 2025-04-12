@@ -1,14 +1,16 @@
+import { THEME_OPTIONS } from "@/constants/constants"
 import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { createContext } from "react"
 
-export type Theme = 'light' | 'dark' | 'system'
+export type Theme = (typeof THEME_OPTIONS)[number] //'light' | 'dark' | 'system'
 
 type ThemeContextType = {
   theme: Theme,
-  setTheme: (theme: Theme) => void
+  setTheme: (theme: Theme) => void,
+  // isDark: boolean,
 }
 
-export const ThemeContext = createContext<ThemeContextType>({} as ThemeContextType)
+export const ThemeContext = createContext<ThemeContextType | null >(null)
 
 /** PROVIDER & PROPS TYPE*/
 type ContextProviderProps = {

@@ -46,10 +46,8 @@ const DEFAULT_VALUES: TaskFormValues = {
   status: "Todo",
 }
 
-export function TaskForm({
-  initialTask = DEFAULT_VALUES,
-  onSubmit,
-}: TaskFormProps) {
+export function TaskForm({ initialTask = DEFAULT_VALUES, onSubmit}: TaskFormProps) {
+  
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialTask,
