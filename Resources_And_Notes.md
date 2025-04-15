@@ -1,7 +1,13 @@
+# Radix UI 
+### Radix UI Dialog
+Styling a Radix Dialog with Tailwind CSS (Sam Selikoff)\
+https://www.youtube.com/watch?v=KvZoBV_1yYE
+
+Dismissing a Radix Dialog after a form submission (Programmatically)\
+https://www.youtube.com/watch?v=3ijyZllWBwU
+
 ### Slot & 'asChild'
 About RadixUI 'Slot' & 'asChild': https://www.youtube.com/watch?v=r0I-pzcE8dg
-
-
 
 # Handling conditional styling
 ### clsx
@@ -65,4 +71,3 @@ https://www.youtube.com/watch?v=qGQRdCg6JRQ (Brooks Lybrand)
 
 # Icon Components:
 lucide-react
-

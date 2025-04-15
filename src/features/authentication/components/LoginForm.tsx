@@ -8,6 +8,7 @@ import useAuth from '../hooks/useAuth'
 import axios from 'axios'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z} from 'zod'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 // import {loginSchema} from '@backend/constants/schemas/users'
 // TODO for some reason, **importing** 'loginSchema' isn't working
@@ -51,20 +52,19 @@ const LoginForm = () => {
   return (
     <Form {...form}>
     {/* Form == FormProvider from react-hook-form */}
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className='p-4'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='md:w-1/2 lg:w-1/3'>
+        <Card className=''>
           <CardHeader>
             <CardTitle>
               Log in
             </CardTitle>
             {form.formState.errors.root?.message && 
-              <CardDescription>
+              <CardDescription className="text-red-500 dark:text-red-900">
                 {form.formState.errors.root.message}
               </CardDescription>
             }
           </CardHeader>
-          <CardContent>
-
+          <CardContent className='space-y-5'>
             {/* FormField seems to be a context provider that wraps the 'render' component for use with react-hook-form */}
             <FormField
               control={form.control} 
@@ -96,14 +96,19 @@ const LoginForm = () => {
           </CardContent>
 
           <CardFooter className='flex gap-3 justify-end'>
-            {/* Cancel button maybe navigate -1 */}
-            <Button type="reset" variant="ghost">Cancel</Button>
-            <Button variant="outline" asChild>
+            <Button type="reset" variant="ghost" asChild>
+              <Link to="/">
+                Cancel
+              </Link>
+            </Button>
+            <Button type="button" variant="outline" asChild>
               <Link to="/signup">
                 Sign Up
               </Link>
             </Button>
-            <Button type="submit" variant="secondary">Log in</Button>
+            <Button type="submit" variant="secondary" disabled={!form.formState.isValid || form.formState.isSubmitting }>
+              {form.formState.isSubmitting ? <LoadingSpinner/> : "Login"}
+            </Button>
           </CardFooter>
         </Card>
       </form>

@@ -4,6 +4,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 
 } from "@/components/ui/dropdown-menu"
@@ -58,11 +61,17 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
-                <DropdownMenuItem asChild>
-                  <Link to="/login">
-                    Login
-                  </Link>
-                </DropdownMenuItem>
+                { !user ? 
+                  <DropdownMenuItem asChild>
+                    <Link to="/login">
+                      Login
+                    </Link>
+                  </DropdownMenuItem>
+                  :
+
+                    <UserMenuSub/>
+
+                }
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -123,7 +132,7 @@ const UserMenu = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800"
+          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800 pr-0"
         >
           {user.email}
           <ChevronDown size={16} className="ml-2"/>
@@ -141,3 +150,34 @@ const UserMenu = () => {
     </DropdownMenu>
   );
 }
+
+const UserMenuSub = () => {
+  const {user, logout} = useAuth()
+
+  if (!user)return null
+
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger asChild>
+        <Button
+        size="sm"
+          variant="ghost"
+          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800"
+        >
+          {user.email}
+          <ChevronDown size={16} className="ml-2"/>
+        </Button>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent >
+        <DropdownMenuItem asChild>
+          <Link to="/jobs">My Listings</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Button variant="ghost" onClick={logout}>Logout</Button>
+        </DropdownMenuItem>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
+  );
+}
+

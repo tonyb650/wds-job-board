@@ -1,16 +1,19 @@
 import { createContext, useEffect, useState } from "react"
-import { User } from "../constants/types"
-import { LoginFormValues } from "../components/LoginForm"
-import axios from "axios"
 import { useNavigate } from "react-router"
-import { loginService } from "../services/auth"
+import { LoginFormValues } from "../components/LoginForm"
+import LogoutDialog from "../components/LogoutDialog"
+import { SignupFormValues } from "../components/SignUpForm"
+import { User } from "../constants/types"
+import { getLoggedInUserService, loginService, logoutService, signupService } from "../services/auth"
 
 
 type AuthContextType = {
-  login: ({email, password} : LoginFormValues) => Promise<User>,
+  login: ({email, password} : LoginFormValues) => Promise<void>,
+  signup: ({email, password, confirmPassword} : SignupFormValues) => Promise<void>,
   logout: () => void,
   user: User | undefined,
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>
+  isLoadingUser: boolean,
 }
 
 export const AuthContext = createContext<AuthContextType | null >(null)
@@ -21,47 +24,69 @@ type ContextProviderProps = {
 }
 
 export const AuthProvider = ( { children }: ContextProviderProps) => {
-  const [ user, setUser ] = useState<User>()
   const navigate = useNavigate()
+  const [ user, setUser ] = useState<User>()
+
+  const [ isLoadingUser, setIsLoadingUser] = useState(false)
+  const [ isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
-    const refresh = async () => {
-      try {
-        const res = await axios.get('http://localhost:3000/users/session', {withCredentials: true})
-        setUser({id: res.data.id, email: res.data.email })
-      } catch (error) {
-        console.log("Failed to fetch session.")
-      }
-    }
-    refresh()
+    // (async () => {
+    //   try {
+    //     setIsLoadingUser(true)
+    //     const {data} = await getLoggedInUserService()
+    //     setUser({id: data.id, email: data.email })
+    //   } catch (error) {
+    //     console.log("Failed to fetch session.")
+    //   } finally {
+    //     setIsLoadingUser(false)
+    //   }
+    // })()
+    /* 
+      The following slick refactoring is made possible by having the service return the 'data', not the 'res'
+      Notice that we can pass the function 'setUser' to .then() without wrapping it in another function 
+    */
+    setIsLoadingUser(true)
+    getLoggedInUserService().then(setUser).finally(() => setIsLoadingUser(false))
   },[])
 
-  const login = ({email, password}: LoginFormValues): Promise<User> => {
+  const login = (formData: LoginFormValues): Promise<void> => {
     // not catching errors here, we want errors caught in the component where they can be displayed for the user
-    return loginService({email, password}).then((res) => {
+    setIsLoadingUser(true)
+    return loginService(formData).then((res) => {
       setUser({id: res.data.id, email: res.data.email })
       navigate("/tasks")
-      return res.data
-    })
+    }).finally(() => setIsLoadingUser(false))
   }
-    
-    const logout = async () => {
-      try {
-        await axios.delete('http://localhost:3000/users/logout', {withCredentials: true})
-        alert("Successfully logged out")
-        navigate("/")
-      } catch (error) {
-        // TODO
-        console.error(error)
-        console.error("Unable to perform session delete")
-      }
 
+  const signup = async ({email, password, confirmPassword}: SignupFormValues): Promise<void> => {
+    setIsLoadingUser(true)
+    return signupService({email, password, confirmPassword}).then((res) => {
+      setUser({id: res.data.id, email: res.data.email })
+      navigate("/tasks")
+    }).finally(() => { setIsLoadingUser(false)})
   }
+
+  const logout = async (): Promise<void> => {
+    try {
+      setIsLoggingOut(true)
+      
+      await logoutService()
+      setUser(undefined)
+      navigate("/") // TODO: Probably should happen automatically when there is no user 
+    } catch (error) {
+      console.error("Unable to perform session delete")
+      console.error(error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+  
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, signup, logout, isLoadingUser }}>
       {children}
+      <LogoutDialog isLoggingOut={isLoggingOut} onOpenChange={setIsLoggingOut}/>
     </AuthContext.Provider>
   )
 }
-
