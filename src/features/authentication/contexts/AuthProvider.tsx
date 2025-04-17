@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router"
 import { LoginFormValues } from "../components/LoginForm"
 import LogoutDialog from "../components/LogoutDialog"
 import { SignupFormValues } from "../components/SignUpForm"
@@ -10,10 +10,10 @@ import { getLoggedInUserService, loginService, logoutService, signupService } fr
 type AuthContextType = {
   login: ({email, password} : LoginFormValues) => Promise<void>,
   signup: ({email, password, confirmPassword} : SignupFormValues) => Promise<void>,
-  logout: () => void,
+  logout: () => Promise<void>,
   user: User | undefined,
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>
-  isLoadingUser: boolean,
+  isLoadingUser: boolean, // <-- Are we loading the user (via cookie) when we load/refresh the page?
 }
 
 export const AuthContext = createContext<AuthContextType | null >(null)
@@ -25,8 +25,9 @@ type ContextProviderProps = {
 
 export const AuthProvider = ( { children }: ContextProviderProps) => {
   const navigate = useNavigate()
-  const [ user, setUser ] = useState<User>()
+  const location = useLocation()
 
+  const [ user, setUser ] = useState<User>()
   const [ isLoadingUser, setIsLoadingUser] = useState(false)
   const [ isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -55,15 +56,15 @@ export const AuthProvider = ( { children }: ContextProviderProps) => {
     setIsLoadingUser(true)
     return loginService(formData).then((res) => {
       setUser({id: res.data.id, email: res.data.email })
-      navigate("/tasks")
+      navigate(location.state?.location ?? "/tasks") // If user is trying to get to protected page and are redirected to login/signup, then .location will return them to the protected page after signup
     }).finally(() => setIsLoadingUser(false))
   }
 
   const signup = async ({email, password, confirmPassword}: SignupFormValues): Promise<void> => {
     setIsLoadingUser(true)
-    return signupService({email, password, confirmPassword}).then((res) => {
-      setUser({id: res.data.id, email: res.data.email })
-      navigate("/tasks")
+    return signupService({email, password, confirmPassword}).then(data => {
+      setUser(data)
+      navigate(location.state?.location ?? "/tasks") // If user is trying to get to protected page and are redirected to login/signup, then .location will return them to the protected page after signup
     }).finally(() => { setIsLoadingUser(false)})
   }
 

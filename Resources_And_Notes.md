@@ -53,7 +53,7 @@ const FancyHeading = ({variant, className}) => {
         return "text-center text-xl text-green-500"
       default:
         return "text-center text-grey-800"
-    }
+    } 
   }
   return (
     <h1 className = {cn(getVariantStyle(variant), className)}>
@@ -71,3 +71,17 @@ https://www.youtube.com/watch?v=qGQRdCg6JRQ (Brooks Lybrand)
 
 # Icon Components:
 lucide-react
+
+
+# Implementation of API services / Axios on the front end
+
+1) `BaseAPI` creates an AxiosInstance that provide base URL and 'credentials: true'
+2) `loginService` takes the `email` & `password` and returns a `Promise<AxiosResponse<User, any >>`
+3) `login` method is provided by `authContext`. When it is called, it takes the `email` & `password` and returns a `Promise<User>>`. It does this by calling `loginService` and then calling .then(res => res.data) on the promise returned by `loginService`
+4) `useAuth` is the hook that makes the `authContext` available in our components. It basically 'passes through' everything from `authContext` untouched
+5) In our form handler, we call the `login` method from our `authContext`. If an error is thrown at any point, we can catch it here with try/catch or .catch(). The error should be of type `AxiosError`
+
+# New techniques or ideas
+* Use Axios interceptor to inject a delay on calls to the back end (when turned on in .env)
+* Limit ability to import/export so that good file structure is maintained. Explicitly exporting needed items in an 'index.ts' file specifically for this purpose.
+* with react-hook-form, use form.formState.isValid to disable submit button until signUp form is filled in correctly

@@ -1,11 +1,9 @@
 import { Outlet } from 'react-router'
 
-const AuthLayout = () => {
+export const AuthLayout = () => {
   return (
-    <div className='h-[80vh] flex justify-center items-center'>
+    <div className='h-full flex justify-center items-center'>
       <Outlet/>
     </div>
   )
 }
-
-export default AuthLayout

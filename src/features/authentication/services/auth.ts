@@ -16,8 +16,8 @@ export function loginService (formData: LoginFormValues): Promise<AxiosResponse<
   return baseApi.post<User>("/users/login", formData) 
 }
 
-export function signupService (formData: SignupFormValues): Promise<AxiosResponse<User, any>> {
-  return baseApi.post<User>("/users/signup", formData) 
+export function signupService (formData: SignupFormValues): Promise<User> {
+  return baseApi.post<User>("/users/signup", formData).then(res => res.data) 
 }
 
 export function logoutService (): Promise<void> {

@@ -121,7 +121,7 @@ const ThemeToggleButton = () => {
   )
 }
 
-
+/* For Desktop, when User is logged in */
 const UserMenu = () => {
   const {user, logout} = useAuth()
 
@@ -143,14 +143,15 @@ const UserMenu = () => {
           <Link to="/jobs">My Listings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Button variant="ghost" onClick={logout}>Logout</Button>
+        <DropdownMenuItem 
+          onClick={logout}>Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
+/* For Mobile, when user is logged in */
 const UserMenuSub = () => {
   const {user, logout} = useAuth()
 
@@ -159,15 +160,17 @@ const UserMenuSub = () => {
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger asChild>
+        {/* Button wrapper not necessary here ??? */}
         <Button
         size="sm"
           variant="ghost"
-          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800"
+          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800 mr-auto"
         >
           {user.email}
           <ChevronDown size={16} className="ml-2"/>
         </Button>
       </DropdownMenuSubTrigger>
+      {/* Content goes inside of DropdownMenuPortal ??? */}
       <DropdownMenuSubContent >
         <DropdownMenuItem asChild>
           <Link to="/jobs">My Listings</Link>

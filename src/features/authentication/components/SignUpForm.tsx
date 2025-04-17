@@ -7,12 +7,17 @@ import { Link } from 'react-router'
 import useAuth from '../hooks/useAuth'
 import axios from 'axios'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z} from 'zod'
+import z from 'zod'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const signupSchema = z.object({
   email: z.string().email().nonempty(),
-  password: z.string().nonempty(),
+  password: z
+      .string()
+      .min(8)
+      .regex(/[0-9]/, "Must contain a number")
+      .regex(/[A-Z]/, "Must contain an uppercase letter")
+      .regex(/[a-z]/, "Must contain a lowercase letter"),
   confirmPassword: z.string().nonempty(),
 }).superRefine(({ confirmPassword, password }, ctx) => {
   if (confirmPassword !== password) {
@@ -40,9 +45,9 @@ const SignupForm = () => {
 
   const { signup } =  useAuth()
 
-  const onSubmit = async (data: SignupFormValues) => {
+  const onSubmit = async (signUpFormValues: SignupFormValues) => {
     try {
-      await signup(data)
+      await signup(signUpFormValues)
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -138,3 +143,4 @@ const SignupForm = () => {
 }
 
 export default SignupForm
+

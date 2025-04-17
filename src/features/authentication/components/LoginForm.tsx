@@ -7,11 +7,15 @@ import { Link } from 'react-router'
 import useAuth from '../hooks/useAuth'
 import axios from 'axios'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z} from 'zod'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import z from 'zod'
 
 // import {loginSchema} from '@backend/constants/schemas/users'
 // TODO for some reason, **importing** 'loginSchema' isn't working
+// ChatGPT Says it's because 'z' as a named export and 'z' as default export are different,
+// Makes sense, but still not working :(
+// And actually, Kyle doesn't have consistency here either and it's working for him.
+
 const loginSchema = z.object({
   email: z.string().email().nonempty(),
   password: z.string().nonempty(),
@@ -116,4 +120,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export  {LoginForm}
