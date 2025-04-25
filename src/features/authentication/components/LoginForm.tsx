@@ -110,7 +110,7 @@ const LoginForm = () => {
                 Sign Up
               </Link>
             </Button>
-            <Button type="submit" variant="secondary" disabled={!form.formState.isValid || form.formState.isSubmitting }>
+            <Button type="submit" disabled={!form.formState.isValid || form.formState.isSubmitting }>
               {form.formState.isSubmitting ? <LoadingSpinner/> : "Login"}
             </Button>
           </CardFooter>

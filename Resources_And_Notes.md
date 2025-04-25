@@ -85,3 +85,13 @@ lucide-react
 * Use Axios interceptor to inject a delay on calls to the back end (when turned on in .env)
 * Limit ability to import/export so that good file structure is maintained. Explicitly exporting needed items in an 'index.ts' file specifically for this purpose.
 * with react-hook-form, use form.formState.isValid to disable submit button until signUp form is filled in correctly
+* Passing in entire sub-components in as props is OK. e.g.: {headerDetails} {footerBtns} in JobListingCard - maybe the term 'named slot' is appropriate here
+* Component name can be thought of as a string variable:
+  ```javascript
+    import { User } from "lucide-react"
+    let Icon: LucideIcon = User
+    <Icon/>
+    is the same as 
+    <User/>
+  ```
+* For components that display a list (array) of records (MyJobListingGrid), we are using a loader (useLoaderData hook) to fetch the initial arra of records. Then, when we DELETE a record, we are mantaining a arra of deleted records (with useState) and we filter out the deleted records from the original arra or records each time the component re-renders. This means that the loader never runs again if we are merely deleting records. 

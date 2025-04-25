@@ -1,10 +1,15 @@
-import { Navigate, RouteObject } from "react-router"
+import { AuthLayout, LoginForm, SignUpForm } from "@/features/authentication"
 import { RootLayout } from "@/layouts/RootLayout"
 import { ErrorPage } from "@/pages/ErrorPage"
-import { TaskListPage } from "@/pages/tasks/TaskListPage"
-import { NewTaskPage } from "@/pages/tasks/NewTaskPage"
 import { NotFoundPage } from "@/pages/NotFoundPage"
-import { AuthLayout, SignUpForm, LoginForm } from "@/features/authentication"
+import { NewTaskPage } from "@/pages/tasks/NewTaskPage"
+import { TaskListPage } from "@/pages/tasks/TaskListPage"
+import { Navigate, RouteObject } from "react-router"
+import { EditListingLoader } from "./pages/listings/EditListingLoader"
+import EditListingPage from "./pages/listings/EditListingPage"
+import { MyListingsLoader } from "./pages/listings/MyListingsLoader"
+import MyListingsPage from "./pages/listings/MyListingsPage"
+import NewListingPage from "./pages/listings/NewListingPage"
 
 export const routes: RouteObject[] = [
   {
@@ -28,6 +33,21 @@ export const routes: RouteObject[] = [
             children: [
               { index: true, element: <TaskListPage /> },
               { path: "new", element: <NewTaskPage /> },
+            ],
+          },
+          { path: "*", element: <NotFoundPage /> },
+          {
+            path: "jobs",
+            children: [
+              { path: "new", element: <NewListingPage /> },
+              { index: true,
+                element: <MyListingsPage />,
+                loader: MyListingsLoader
+              },
+              { path: ":id/edit", 
+                element: <EditListingPage />,
+                loader: EditListingLoader
+              },
             ],
           },
           { path: "*", element: <NotFoundPage /> },
