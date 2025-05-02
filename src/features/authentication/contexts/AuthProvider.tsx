@@ -74,7 +74,7 @@ export const AuthProvider = ( { children }: ContextProviderProps) => {
       
       await logoutService()
       setUser(undefined)
-      navigate("/") // TODO: Probably should happen automatically when there is no user 
+      navigate("/") // TODO: Maybe should happen automatically because there is now no user 
     } catch (error) {
       console.error("Unable to perform session delete")
       console.error(error)

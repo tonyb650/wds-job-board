@@ -18,21 +18,60 @@ import { Link } from "react-router";
 import { JobListing } from "../constants/types";
 import JobListingCard from "./JobListingCard";
 import { deleteJobListing } from "../services/jobListings";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 type Props = {
   jobListings: JobListing[];
 };
 
 const MyJobListingGrid = ({ jobListings }: Props) => {
+  const [deletedListingsIds, setDeletedListingsIds] = useState<string[]>([])
+  const {toast} = useToast()
+  
+  async function handleDelete(jobListing: JobListing) {
+    try {
+      await deleteJobListing(jobListing.id)
+      setDeletedListingsIds([...deletedListingsIds, jobListing.id])
+      alert("Listing Deleted")
+      
+    } catch (error) {
+      // We are going to have a toast here if the deletion fails
+      toast({
+        title: "Deletion Failed",
+        description: `Could not delete job listing at this time.`,
+        // action: (
+        //   <ToastAction
+        //     onClick={() =>
+        //       setTasks(currentTasks => {
+        //         const newArray = [...currentTasks]
+        //         newArray.splice(index, 0, task)
+        //         return newArray
+        //       })
+        //     }
+        //     altText="Recreate the task"
+        //   >
+        //     Undo
+        //   </ToastAction>
+        // ),
+        action: (<ToastAction altText="Close Notification">Close</ToastAction>)
+      })
+      // alert("Deletion failed")
+    }
+  }
+
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-      {jobListings.map((jobListing) => (
+      {jobListings
+        .filter(jobListing => !deletedListingsIds.includes(jobListing.id))
+        .map((jobListing) => (
         <JobListingCard
           key={jobListing.id}
           listing={jobListing}
           footer={
             <>
-              <DeleteJobListingModal jobListing={jobListing} />
+              <DeleteJobListingModal jobListing={jobListing} handleDelete={handleDelete}/>
               <Button type="button" variant="outline" asChild>
                 <Link to={`/jobs/${jobListing.id}/edit`}>Edit</Link>
               </Button>
@@ -56,14 +95,13 @@ const MyJobListingGrid = ({ jobListings }: Props) => {
 export default MyJobListingGrid;
 
 
+type DeleteJobListingModalProps = {
+  jobListing: JobListing,
+  handleDelete: (jobListing: JobListing) => void,
+}
 
-
-const DeleteJobListingModal = ({ jobListing }: { jobListing: JobListing }) => {
-  async function handleDelete() {
-    const deletedListing = await deleteJobListing(jobListing.id)
-    console.log("Listing Deleted")
-    console.log(deletedListing)
-  }
+const DeleteJobListingModal = ({ jobListing , handleDelete }: DeleteJobListingModalProps) => {
+  
 
   
   return (
@@ -90,7 +128,7 @@ const DeleteJobListingModal = ({ jobListing }: { jobListing: JobListing }) => {
               <AlertDialogCancel asChild>
                 <Button variant={"outline"}>Cancel</Button>
               </AlertDialogCancel>
-              <AlertDialogAction asChild onClick={handleDelete}>
+              <AlertDialogAction asChild onClick={() => handleDelete(jobListing)}>
                 <Button variant={"default"}>
                   Continue
                 </Button>

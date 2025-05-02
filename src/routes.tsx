@@ -10,6 +10,7 @@ import EditListingPage from "./pages/listings/EditListingPage"
 import { MyListingsLoader } from "./pages/listings/MyListingsLoader"
 import MyListingsPage from "./pages/listings/MyListingsPage"
 import NewListingPage from "./pages/listings/NewListingPage"
+import Private from "./layouts/PrivateLayout"
 
 export const routes: RouteObject[] = [
   {
@@ -35,9 +36,9 @@ export const routes: RouteObject[] = [
               { path: "new", element: <NewTaskPage /> },
             ],
           },
-          { path: "*", element: <NotFoundPage /> },
           {
             path: "jobs",
+            element: <Private/>,
             children: [
               { path: "new", element: <NewListingPage /> },
               { index: true,

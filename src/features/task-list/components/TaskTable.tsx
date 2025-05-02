@@ -231,6 +231,8 @@ export function TaskTable() {
     })
   }, [setTasks, toast])
 
+  console.log(columns)
+
   return (
     <DataTable<Task>
       columns={columns}
