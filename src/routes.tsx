@@ -5,12 +5,12 @@ import { NotFoundPage } from "@/pages/NotFoundPage"
 import { NewTaskPage } from "@/pages/tasks/NewTaskPage"
 import { TaskListPage } from "@/pages/tasks/TaskListPage"
 import { Navigate, RouteObject } from "react-router"
-import { EditListingLoader } from "./pages/listings/EditListingLoader"
-import EditListingPage from "./pages/listings/EditListingPage"
-import { MyListingsLoader } from "./pages/listings/MyListingsLoader"
-import MyListingsPage from "./pages/listings/MyListingsPage"
-import NewListingPage from "./pages/listings/NewListingPage"
-import Private from "./layouts/PrivateLayout"
+import Private from "./components/routing/PrivatePage"
+import { editListingRoute } from "./pages/listings/edit-listing"
+import JobListings from "./pages/listings/job-listings/JobListings"
+import { MyListingsLoader } from "./pages/listings/my-listings/MyListingsLoader"
+import MyListingsPage from "./pages/listings/my-listings/MyListingsPage"
+import NewListingPage from "./pages/listings/new-listing/NewListingPage"
 
 export const routes: RouteObject[] = [
   {
@@ -38,17 +38,16 @@ export const routes: RouteObject[] = [
           },
           {
             path: "jobs",
-            element: <Private/>,
             children: [
-              { path: "new", element: <NewListingPage /> },
               { index: true,
-                element: <MyListingsPage />,
+                element: <JobListings />,
+              },
+              { path: "my-listings",
+                element: <Private><MyListingsPage /></Private>,
                 loader: MyListingsLoader
               },
-              { path: ":id/edit", 
-                element: <EditListingPage />,
-                loader: EditListingLoader
-              },
+              { path: "new", element: <Private><NewListingPage /></Private> },
+              { path: ":id/edit", ...editListingRoute},
             ],
           },
           { path: "*", element: <NotFoundPage /> },

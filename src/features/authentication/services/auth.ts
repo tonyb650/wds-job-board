@@ -13,6 +13,7 @@ Not totally sure of the return type here:
   Promise<AxiosResponse<User, AxiosError>> ?
 */
 export function loginService (formData: LoginFormValues): Promise<AxiosResponse<User, any>> {
+  console.log(baseApi)
   return baseApi.post<User>("/users/login", formData) 
 }
 

@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/ui/PageHeader"
-import { addJobListing } from "@/features/job-listing"
-import JobListingForm from "@/features/job-listing/components/JobListingForm"
+import { addJobListing, JobListingForm } from "@/features/job-listing"
 import { useNavigate } from "react-router"
 
 const NewListingPage = () => {
@@ -12,7 +11,7 @@ const NewListingPage = () => {
       <JobListingForm
         onSubmit={ async (newJobListing) => {
           await addJobListing(newJobListing)
-          navigate("/jobs")
+          navigate("/jobs/my-listings")
         }}
       />
     </>

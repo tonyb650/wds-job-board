@@ -1,46 +1,61 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import daysLeft from '@/utils/daysLeft'
 import formatUSD from '@/utils/formatUSD'
+import { cn } from '@/utils/shadcnUtils'
 import { Banknote, CalendarDaysIcon, GraduationCap } from 'lucide-react'
 import { ReactNode } from 'react'
 import { JobListing } from '../constants/types'
 
-type Props = {
-  listing: JobListing,
-  footer: ReactNode
-}
+// Kyle passes individual 'listing' properties, not the whole listing. I wonder what his thinking is? Prevent unnecessary rerenders?
+// It is a very good demonstration of defining specific types from a larger type
+// I am going to try to recreate this without cheating :)
+// OK, I cheated. The key is to use 'Pick<>'
 
-const JobListingCard = ({listing, footer}: Props) => {
+// type Props = {
+//   className?: string;
+//   jobListing: JobListing,
+//   headerDetails?: ReactNode
+//   footer?: ReactNode
+// }
+
+type JobListingCardProps = {
+  className?: string,
+  headerDetails?: ReactNode,
+  footer?: ReactNode,
+} & Pick<JobListing, "title" | "companyName" | "location" | "salary" | "type" | "experienceLevel" | "shortDescription">
+
+const JobListingCard = ({title, companyName, location, salary, type: jobType, experienceLevel, shortDescription, className, headerDetails, footer}: JobListingCardProps) => {
   return (
-    <Card>
+    <Card className={cn("h-full flex flex-col",className)}>
       <CardHeader>
-        <CardTitle className="flex justify-between">
-          {listing.title}
-          <PublicationStatusBadge expires={listing.expiresAt}/>
+        <CardTitle className="flex justify-between gap-4">
+          {title}
+          {headerDetails}
         </CardTitle>
         <CardDescription>
-          <span className="block">{listing.companyName}</span>
-          <span className="block">{listing.location}</span>
+          <span className="block">{companyName}</span>
+          <span className="block">{location}</span>
         </CardDescription>
-        <div className='flex gap-2'>
-          <Badge variant={"secondary"} className='flex gap-1 items-center'>
+        <div className='flex gap-1 flex-wrap'>
+          <Badge variant={"secondary"} className='flex gap-1 items-center whitespace-nowrap'>
             <Banknote size={16}/>
-            {formatUSD(listing.salary)}
+            {formatUSD(salary)}
           </Badge>
-          <Badge variant={"secondary"} className='flex gap-1 items-center'>
+          <Badge variant={"secondary"} className='flex gap-1 items-center whitespace-nowrap'>
             <CalendarDaysIcon size={14}/>
-            {listing.type}
+            {jobType}
           </Badge>
-          <Badge variant={"secondary"} className='flex gap-1 items-center'>
+          <Badge variant={"secondary"} className='flex gap-1 items-center whitespace-nowrap'>
             <GraduationCap size={16}/>
-            {listing.experienceLevel}
+            {experienceLevel}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>{listing.shortDescription}</CardContent>
+      {/* flex-grow here, in combination with the h-full on the whole card, pushes the buttons to the bottom when needed */}
+      <CardContent className='flex-grow'>{shortDescription}</CardContent>
 
-      <CardFooter className='flex gap-2 justify-end'>
+      {/* item-stretch here "fills the full height". I'm not totally sure why we need this. Maybe to make sure all the buttons are the same height. Unclear. */}
+      <CardFooter className='flex gap-2 justify-end items-stretch'>
         {footer}
       </CardFooter>
     </Card>
@@ -48,15 +63,3 @@ const JobListingCard = ({listing, footer}: Props) => {
 }
 
 export default JobListingCard
-
-
-const PublicationStatusBadge = ({expires}: {expires: Date | undefined}) => {
-
-  if (!expires) {
-    return <Badge variant={"secondary"} className='rounded-md'>Draft</Badge>
-  } else if (expires && expires < new Date()) {
-    return <Badge variant={"default"} className='rounded-md'>Active - {daysLeft(expires)}</Badge>
-  } else {
-    return <Badge variant={"outline"} className='rounded-md'>Expired</Badge>
-  }
-}

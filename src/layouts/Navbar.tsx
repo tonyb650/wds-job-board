@@ -140,7 +140,7 @@ const UserMenu = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center">
         <DropdownMenuItem asChild>
-          <Link to="/jobs">My Listings</Link>
+          <Link to="/jobs/my-listings">My Listings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
@@ -173,7 +173,7 @@ const UserMenuSub = () => {
       {/* Content goes inside of DropdownMenuPortal ??? */}
       <DropdownMenuSubContent >
         <DropdownMenuItem asChild>
-          <Link to="/jobs">My Listings</Link>
+          <Link to="/jobs/my-listings">My Listings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

@@ -1,13 +1,14 @@
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
 import { PageHeader } from "@/components/ui/PageHeader"
-import JobListingForm from "@/features/job-listing/components/JobListingForm"
+import { JobListingForm } from "@/features/job-listing"
 import { updateJobListing } from "@/features/job-listing/services/jobListings"
 import { Suspense } from "react"
 import { Await, useLoaderData, useNavigate } from "react-router"
+import { EditListingLoader } from "./EditListingLoader"
 
 const EditListingPage = () => {
-  const {jobListingPromise} = useLoaderData()
   const navigate = useNavigate()
+  const { id, jobListingPromise} = useLoaderData<typeof EditListingLoader>()
 
   return (
     <>
@@ -17,10 +18,10 @@ const EditListingPage = () => {
           {
             jobListing => 
             <JobListingForm
-              jobListing = {jobListing}
+              initialJobListing = {jobListing}
               onSubmit={async (updatedJobListing) => {
-                await updateJobListing(jobListing.id, updatedJobListing)
-                navigate("/jobs")
+                await updateJobListing(id, updatedJobListing)
+                navigate("/jobs/my-listings")
               }}
             />
           }

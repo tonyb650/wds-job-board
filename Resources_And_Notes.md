@@ -1,3 +1,26 @@
+# Forbid Cross-Feature Imports using ESLint
+
+snippet from `eslintrc.cjs`
+```json
+rules: {
+  "react-refresh/only-export-components": "warn",
+  "import/no-restricted-paths": [
+    "error",
+    {
+      basePath: "./src",
+      zones: [
+        {
+          target: ["./!(features)/**/*", "./!(features)*"],
+          from: ["./features/*/!(index.*)", "./features/*/!(index.*)/**/*"],
+          message:
+            "Cannot import anything except the index file within a feature folder",
+        },
+      ],
+    },
+  ],
+},
+```
+
 # Radix UI 
 ### Radix UI Dialog
 Styling a Radix Dialog with Tailwind CSS (Sam Selikoff)\
@@ -95,3 +118,5 @@ lucide-react
     <User/>
   ```
 * For components that display a list (array) of records (MyJobListingGrid), we are using a loader (useLoaderData hook) to fetch the initial arra of records. Then, when we DELETE a record, we are mantaining a arra of deleted records (with useState) and we filter out the deleted records from the original arra or records each time the component re-renders. This means that the loader never runs again if we are merely deleting records. 
+* Kyle makes a practice of passing the bare minimum of what is needed to functions. For example, when deleting a job listing, he only passes the `id` string instead of the whole `jobListing` object
+* 

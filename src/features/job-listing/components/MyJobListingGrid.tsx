@@ -7,6 +7,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -17,10 +18,13 @@ import {
 import { Link } from "react-router";
 import { JobListing } from "../constants/types";
 import JobListingCard from "./JobListingCard";
-import { deleteJobListing } from "../services/jobListings";
-import { useState } from "react";
+import { deleteJobListing as deleteJobListingService } from "../services/jobListings";
+import { useMemo, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import JobListingGrid from "./JobListingGrid";
+import { Badge } from "@/components/ui/badge";
+import daysLeft from "@/utils/daysLeft";
 
 type Props = {
   jobListings: JobListing[];
@@ -28,81 +32,97 @@ type Props = {
 
 const MyJobListingGrid = ({ jobListings }: Props) => {
   const [deletedListingsIds, setDeletedListingsIds] = useState<string[]>([])
-  const {toast} = useToast()
+
+
+  // useMemo here seems like overkill, but nice to see how it is implemented. And maybe it is more important than I think.
+  const visibleJobListings = useMemo(() => {
+    return jobListings
+    .filter(jobListing => !deletedListingsIds.includes(jobListing.id))
+    .sort((a, b) => (a.expiresAt?.getTime() || 0 )- (b.expiresAt?.getTime() || 0)) // Kyle extracts into a helper function sortJobListings
+  }, [jobListings, deletedListingsIds])
   
-  async function handleDelete(jobListing: JobListing) {
-    try {
-      await deleteJobListing(jobListing.id)
-      setDeletedListingsIds([...deletedListingsIds, jobListing.id])
-      alert("Listing Deleted")
-      
-    } catch (error) {
-      // We are going to have a toast here if the deletion fails
-      toast({
-        title: "Deletion Failed",
-        description: `Could not delete job listing at this time.`,
-        // action: (
-        //   <ToastAction
-        //     onClick={() =>
-        //       setTasks(currentTasks => {
-        //         const newArray = [...currentTasks]
-        //         newArray.splice(index, 0, task)
-        //         return newArray
-        //       })
-        //     }
-        //     altText="Recreate the task"
-        //   >
-        //     Undo
-        //   </ToastAction>
-        // ),
-        action: (<ToastAction altText="Close Notification">Close</ToastAction>)
-      })
-      // alert("Deletion failed")
-    }
-  }
+
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-      {jobListings
-        .filter(jobListing => !deletedListingsIds.includes(jobListing.id))
-        .map((jobListing) => (
-        <JobListingCard
-          key={jobListing.id}
-          listing={jobListing}
-          footer={
-            <>
-              <DeleteJobListingModal jobListing={jobListing} handleDelete={handleDelete}/>
-              <Button type="button" variant="outline" asChild>
-                <Link to={`/jobs/${jobListing.id}/edit`}>Edit</Link>
-              </Button>
-              {jobListing.expiresAt ? (
-                <Button type="submit" disabled={false}>
-                  {false ? <LoadingSpinner /> : "Extend"}
-                </Button>
-              ) : (
-                <Button type="submit" disabled={false}>
-                  {false ? <LoadingSpinner /> : "Publish "}
-                </Button>
-              )}
-            </>
-          }
-        />
-      ))}
-    </div>
+      <JobListingGrid>
+        {visibleJobListings
+          .map((jobListing) => <MyJobListingCard key={jobListing.id} jobListing={jobListing} setDeletedListingsIds={setDeletedListingsIds}/>)}
+      </JobListingGrid>
   );
 };
 
 export default MyJobListingGrid;
 
 
+/* It is notable that Kyle separated MyJobListingCard out to a separate component. My inclination was 100% to keep all of this inside MyJobListingGrid */
+const MyJobListingCard = ({jobListing, setDeletedListingsIds}: {jobListing: JobListing, setDeletedListingsIds:  React.Dispatch<React.SetStateAction<string[]>>}) => {
+  const {toast} = useToast() // Kyle imports 'toast' directly, doesn't import useToast and instantiate it like he does in the 'TaskTable' component
+
+  // Kyle hoists this function to the parent component, MyJobListingGrid
+  async function deleteJobListing() {
+    try {
+      await deleteJobListingService(jobListing.id)
+      setDeletedListingsIds(ids => [...ids, jobListing.id]) // Notice the function form of the setState. **Passing a function is preferred whenever state depends on previous state**
+    } catch (error) {
+      toast({
+        title: "Deletion Failed",
+        // Notice that the alt tag is for people who can't see the toast and it tells them what they can do instead of using the button on the toast
+        action: (<ToastAction altText="Click the delete button in the job card to retry" onClick={deleteJobListing}>Retry</ToastAction>)
+      })
+    }
+  }
+
+  return (
+    <JobListingCard
+      key={jobListing.id}
+      {...jobListing}
+      headerDetails={
+        <PublicationStatusBadge expires={jobListing.expiresAt || undefined} />
+      }
+      footer={
+        <>
+          <DeleteJobListingModal
+            jobListing={jobListing}
+            handleDelete={deleteJobListing}
+          />
+          <Button type="button" variant="outline" asChild>
+            <Link to={`/jobs/${jobListing.id}/edit`}>Edit</Link>
+          </Button>
+          {jobListing.expiresAt ? (
+            <Button type="submit" disabled={false}>
+              {false ? <LoadingSpinner /> : "Extend"}
+            </Button>
+          ) : (
+            <Button type="submit" disabled={false}>
+              {false ? <LoadingSpinner /> : "Publish "}
+            </Button>
+          )}
+        </>
+      }
+    />
+  );
+}
+
+// ! This is going to need some work
+const PublicationStatusBadge = ({expires}: {expires: Date | undefined}) => {
+
+  if (!expires) {
+    return <Badge variant={"secondary"} className='rounded-md'>Draft</Badge>
+  } else if (expires && expires < new Date()) {
+    return <Badge variant={"default"} className='rounded-md'>Active - {daysLeft(expires)}</Badge>
+  } else {
+    return <Badge variant={"outline"} className='rounded-md'>Expired</Badge>
+  }
+}
+
+
+
 type DeleteJobListingModalProps = {
   jobListing: JobListing,
-  handleDelete: (jobListing: JobListing) => void,
+  handleDelete: () => void,
 }
 
 const DeleteJobListingModal = ({ jobListing , handleDelete }: DeleteJobListingModalProps) => {
-  
-
   
   return (
     <AlertDialog>
@@ -116,7 +136,9 @@ const DeleteJobListingModal = ({ jobListing , handleDelete }: DeleteJobListingMo
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader>
-              Are you sure you want to delete this job listing?
+              <AlertDialogTitle>
+                Are you sure you want to delete this job listing?
+              </AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete your
@@ -125,13 +147,15 @@ const DeleteJobListingModal = ({ jobListing , handleDelete }: DeleteJobListingMo
             </AlertDialogDescription>
 
             <AlertDialogFooter>
-              <AlertDialogCancel asChild>
-                <Button variant={"outline"}>Cancel</Button>
+              <AlertDialogCancel >
+                {/* <Button variant={"outline"}>  (not needed, styles are provided already in the AlertDialog component */}
+                  Cancel
+                {/* </Button> */}
               </AlertDialogCancel>
-              <AlertDialogAction asChild onClick={() => handleDelete(jobListing)}>
-                <Button variant={"default"}>
+              <AlertDialogAction  onClick={handleDelete}>
+                {/* <Button variant={"default"}> */}
                   Continue
-                </Button>
+                {/* </Button> */}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -1,6 +1,10 @@
-import { User } from "@/features/authentication/constants/types";
-import { JobListingExperienceLevel, JobListingType } from "../components/JobListingForm";
+import { z } from "zod";
+import { jobListingSchema } from "./schemas";
 
+
+export type JobListing = z.infer<typeof jobListingSchema>
+
+/*
 export type JobListing = {
   id : string,
   title: string,
@@ -19,3 +23,4 @@ export type JobListing = {
   postedBy?: User,
   postedById?: string,
 }
+  */
