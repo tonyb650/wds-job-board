@@ -11,7 +11,6 @@ import JobListings from "./pages/listings/job-listings/JobListings"
 import { MyListingsLoader } from "./pages/listings/my-listings/MyListingsLoader"
 import MyListingsPage from "./pages/listings/my-listings/MyListingsPage"
 import NewListingPage from "./pages/listings/new-listing/NewListingPage"
-// import OrderCompletePage from "./pages/listings/oder-complete/OrderCompletePage"
 import { orderCompleteRoute } from "./pages/listings/oder-complete"
 
 export const routes: RouteObject[] = [

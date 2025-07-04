@@ -30,8 +30,6 @@ export const ThemeProvider = ( { children }: ContextProviderProps) => {
     setTheme(newTheme)
   }
   
-  // later on, we are going to need to add 'isDark' to the Theme Context
-  // that will be with isDark: document.documentElement.classList.contains("dark") (a boolean)
 
   return (
     <ThemeContext.Provider value={{ theme, isDark: document.documentElement.classList.contains("dark"), setTheme: changeTheme }}>
