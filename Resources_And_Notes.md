@@ -120,3 +120,30 @@ lucide-react
 * For components that display a list (array) of records (MyJobListingGrid), we are using a loader (useLoaderData hook) to fetch the initial arra of records. Then, when we DELETE a record, we are mantaining a arra of deleted records (with useState) and we filter out the deleted records from the original arra or records each time the component re-renders. This means that the loader never runs again if we are merely deleting records. 
 * Kyle makes a practice of passing the bare minimum of what is needed to functions. For example, when deleting a job listing, he only passes the `id` string instead of the whole `jobListing` object
 * 
+
+# Stripe
+Conceptually, how does Stripe work?
+## Stripe Account
+When you set up your Stripe account, you get a "Publishable Key" and a "Secret Key". The secret key is used in the back end to instatiate Stripe, the publishable key is used to instantiate Strip on the front end.
+
+Somewhere in your app, you will have a page with the Stripe form, perhaps a modal. You should have a state variable that holds the 'clientSecret' in that component. Upon mounting of that page/component, fire a useEffect to 'create a payment intent'. This is a call to your backend that sends information like what item the user is buying and the quantity (BUT NOT THE PRICE - that is safely calculated in the back end). This API call returns the 'clientSecret' that you store in state and use later.
+
+There is more than one way to render the Stripe form, but in this case we use `<PaymentElement/>` wrapped by a `<form>` and then wrapped by `<Elements>` which are both components provided by 'react-stripe-js'. Together, these components handle the rendering of payment form. On the same page as the `<form>` we bring in the 'useStripe()' hook and the 'useElements()' hook.
+
+Set up a 'handleSubmit' function for the `<form>`. The stripe object returned from the 'useStripe' hook has a `confirmPayment` method on it. When the form is submitted, we call that 'confirmPayment' method and pass the 'elements' (from useElements) as well as 'return_url' to send the user to after the payment attempt is processed. When the 'confirmPayment' is called, that is reaching out to Stripe and validating the attempted payment. If the payment is successful, then Stripe sends a POST request to our back end (in this case at '/job-listing-order-complete'). The back end processes the POST requests and decodes an 'event'. If the 'event.type' == "payment_intent.succeeded", then we should process the customers order and give them what they paid for!
+
+Meanwhile, if there was no immediate error when running the 'confirmPayment' method, that function will automatically redirect the user to the 'return_url' specified. Note that search params are added to the 'return_url': "payment_intent", "payment_intent_client_secret", and "redirect_status". 
+
+At the 'return_url' page (in this case "OrderCompletePage.tsx"), we use the 'loadStripe' function from '@stripe/stripe-js' to get and await an instance of Stripe. On this instance, we call `.retrievePaymentIntent()` and pass it the clientSecret that was included in the redirect_url. Presumably, this method reaches out to Stripe servers and gives us a 'status' property that is a pre-defined string that we can switch on to render a status message to our user.
+
+### Stripe Links/Resources
+dashboard.stripe.com/settings/payment_methods
+
+The stripe-js libary provides the <Elements> component
+https://docs.stripe.com/payments/elements
+
+The Elements component wraps the PaymentElement component
+https://docs.stripe.com/payments/payment-element
+
+Here is the actual sample code that Stripe offers for Node server and React client:
+https://docs.stripe.com/payments/quickstart?client=react

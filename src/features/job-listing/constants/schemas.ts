@@ -41,6 +41,8 @@ export type JobListingExperienceLevel = (typeof JOB_LISTING_EXPERIENCE_LEVELS)[n
 
 export const JOB_LISTING_DURATIONS = [30, 60, 90] as const
 
+export type JobListingDuration = (typeof JOB_LISTING_DURATIONS)[number]
+
 /* Schema for the job listing FORM (What goes TO the back end)*/
 export const jobListingFormSchema = z.object({
   title: z.string().nonempty(),

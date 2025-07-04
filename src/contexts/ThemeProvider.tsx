@@ -6,8 +6,8 @@ export type Theme = (typeof THEME_OPTIONS)[number] //'light' | 'dark' | 'system'
 
 type ThemeContextType = {
   theme: Theme,
+  isDark: boolean,
   setTheme: (theme: Theme) => void,
-  // isDark: boolean,
 }
 
 export const ThemeContext = createContext<ThemeContextType | null >(null)
@@ -34,7 +34,7 @@ export const ThemeProvider = ( { children }: ContextProviderProps) => {
   // that will be with isDark: document.documentElement.classList.contains("dark") (a boolean)
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: changeTheme }}>
+    <ThemeContext.Provider value={{ theme, isDark: document.documentElement.classList.contains("dark"), setTheme: changeTheme }}>
       {children}
     </ThemeContext.Provider>
   )

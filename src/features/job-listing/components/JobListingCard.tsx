@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import formatUSD from '@/utils/formatUSD'
-import { cn } from '@/utils/shadcnUtils'
+import { cn } from '../../../utils/shadcnUtils'
 import { Banknote, CalendarDaysIcon, GraduationCap } from 'lucide-react'
 import { ReactNode } from 'react'
 import { JobListing } from '../constants/types'

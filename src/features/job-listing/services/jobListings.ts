@@ -1,6 +1,7 @@
 import { baseApi } from "@/services/baseApi";
 import { JobListing } from "../constants/types";
 import { JobListingFormValues, jobListingSchema } from "../constants/schemas";
+import { z } from "zod";
 
 /*
 1. `GET /job-listings/published` - This route will return all the published job listings. This is useful for getting the job listings to display on the job board.
@@ -17,7 +18,8 @@ import { JobListingFormValues, jobListingSchema } from "../constants/schemas";
   Kyle skips the generic type and instead uses Zod's parseAsync method on the jobListingSchema and passes
   in the response data.
   It seems to achieve the same result.
-  
+  Aha! A big difference with *dates*. Zod coerces the string that comes from the DB into an actual JS Date object. This is really nice!
+    
   ChatGPT explains it nicely though!
   Zod validation is more robust in the long term, because:
   * This provides runtime validation of the API response.
@@ -26,11 +28,11 @@ import { JobListingFormValues, jobListingSchema } from "../constants/schemas";
 */
 
 export function getMyListings() {
-  return baseApi.get<JobListing[]>(`/job-listings/my-listings`).then(res => res.data) 
+  return baseApi.get<JobListing[]>(`/job-listings/my-listings`).then(res => z.array(jobListingSchema).parseAsync(res.data)) 
 }
 
 export function getJobListing(id: string) {
-  return baseApi.get<JobListing>(`/job-listings/${id}`).then(res => res.data) 
+  return baseApi.get<JobListing>(`/job-listings/${id}`).then(res => jobListingSchema.parseAsync(res.data)) 
 }
 
 export function createJobListing (formData: JobListingFormValues) {
@@ -38,9 +40,13 @@ export function createJobListing (formData: JobListingFormValues) {
 }
 
 export function updateJobListing (id: string, formData: JobListingFormValues) { 
-  return baseApi.put<JobListing>(`/job-listings/${id}`, formData).then(res => res.data) 
+  return baseApi.put<JobListing>(`/job-listings/${id}`, formData).then(res => res.data) // add parseAsync ? remove generic type ?
 }
 
 export function deleteJobListing (id: string) { 
   return baseApi.delete(`/job-listings/${id}`).then(res => res.data) 
+}
+
+export function createListingPublishPaymentIntent (id: string, duration: number) { 
+  return baseApi.post<{clientSecret: string}>(`/job-listings/${id}/create-publish-payment-intent`, {duration}).then(res => res.data) 
 }

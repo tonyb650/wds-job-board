@@ -74,7 +74,6 @@ export const AuthProvider = ( { children }: ContextProviderProps) => {
       
       await logoutService()
       setUser(undefined)
-      navigate("/") // TODO: Maybe should happen automatically because there is now no user 
     } catch (error) {
       console.error("Unable to perform session delete")
       console.error(error)
@@ -83,7 +82,6 @@ export const AuthProvider = ( { children }: ContextProviderProps) => {
     }
   }
   
-
   return (
     <AuthContext.Provider value={{ user, setUser, login, signup, logout, isLoadingUser }}>
       {children}

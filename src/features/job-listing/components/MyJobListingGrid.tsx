@@ -1,4 +1,3 @@
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,20 +10,26 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialogOverlay,
   AlertDialogPortal,
 } from "@radix-ui/react-alert-dialog";
-import { Link } from "react-router";
-import { JobListing } from "../constants/types";
-import JobListingCard from "./JobListingCard";
-import { deleteJobListing as deleteJobListingService } from "../services/jobListings";
 import { useMemo, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { Link } from "react-router";
+import { getJobListingPriceInCents } from "../../../../../api/src/utils/getJobListingPriceInCents";
+import { JOB_LISTING_DURATIONS, JobListingDuration } from "../constants/schemas";
+import { JobListing } from "../constants/types";
+import publishedStatus from "../helpers/publishedStatus";
+import { createListingPublishPaymentIntent, deleteJobListing as deleteJobListingService } from "../services/jobListings";
+import JobListingCard from "./JobListingCard";
 import JobListingGrid from "./JobListingGrid";
-import { Badge } from "@/components/ui/badge";
-import daysLeft from "@/utils/daysLeft";
+import PublicationStatusBadge from "./PublicationStatusBadge";
+import StripeForm from "./StripeForm";
+
 
 type Props = {
   jobListings: JobListing[];
@@ -38,7 +43,8 @@ const MyJobListingGrid = ({ jobListings }: Props) => {
   const visibleJobListings = useMemo(() => {
     return jobListings
     .filter(jobListing => !deletedListingsIds.includes(jobListing.id))
-    .sort((a, b) => (a.expiresAt?.getTime() || 0 )- (b.expiresAt?.getTime() || 0)) // Kyle extracts into a helper function sortJobListings
+    .sort(jobListingSortFunction)
+    // .sort((a: JobListing, b: JobListing) => ((a.expiresAt?.getTime() || 0) - (b.expiresAt?.getTime() || 0))) // Kyle extracts into a helper function sortJobListings
   }, [jobListings, deletedListingsIds])
   
 
@@ -77,7 +83,7 @@ const MyJobListingCard = ({jobListing, setDeletedListingsIds}: {jobListing: JobL
       key={jobListing.id}
       {...jobListing}
       headerDetails={
-        <PublicationStatusBadge expires={jobListing.expiresAt || undefined} />
+        <PublicationStatusBadge expiresAt={jobListing.expiresAt ?? undefined} />
       }
       footer={
         <>
@@ -88,33 +94,12 @@ const MyJobListingCard = ({jobListing, setDeletedListingsIds}: {jobListing: JobL
           <Button type="button" variant="outline" asChild>
             <Link to={`/jobs/${jobListing.id}/edit`}>Edit</Link>
           </Button>
-          {jobListing.expiresAt ? (
-            <Button type="submit" disabled={false}>
-              {false ? <LoadingSpinner /> : "Extend"}
-            </Button>
-          ) : (
-            <Button type="submit" disabled={false}>
-              {false ? <LoadingSpinner /> : "Publish "}
-            </Button>
-          )}
+          <PaymentModal jobListing={jobListing}/>
         </>
       }
     />
   );
 }
-
-// ! This is going to need some work
-const PublicationStatusBadge = ({expires}: {expires: Date | undefined}) => {
-
-  if (!expires) {
-    return <Badge variant={"secondary"} className='rounded-md'>Draft</Badge>
-  } else if (expires && expires < new Date()) {
-    return <Badge variant={"default"} className='rounded-md'>Active - {daysLeft(expires)}</Badge>
-  } else {
-    return <Badge variant={"outline"} className='rounded-md'>Expired</Badge>
-  }
-}
-
 
 
 type DeleteJobListingModalProps = {
@@ -164,3 +149,83 @@ const DeleteJobListingModal = ({ jobListing , handleDelete }: DeleteJobListingMo
     </AlertDialog>
   );
 };
+
+const PaymentModal = ({ jobListing }: { jobListing: JobListing }) => {
+  const [duration, setDuration] = useState<JobListingDuration>()
+  const [clientSecret, setClientSecret] = useState<string>()
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <PublishDropDownOptions jobListing={jobListing} setDuration={setDuration} setClientSecret={setClientSecret}/>
+      </DialogTrigger>
+      <DialogContent className="max-h-[calc(100vh-5rem)] flex flex-col max-w-3xl w-[calc(100vw-2rem)]">
+        <DialogHeader>
+          <DialogTitle>          {
+            { expired: "Republish", active: "Extend", unpublished: "Publish" }[
+              publishedStatus(jobListing.expiresAt)
+            ]
+          } {jobListing.title} for {duration} days</DialogTitle>
+          <DialogDescription>
+            This is a non-refundable purchase.
+          </DialogDescription>
+          
+          {clientSecret && duration && <StripeForm duration={duration} clientSecret={clientSecret}/>}
+          
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+type PublishDropDownOptionsProps = { 
+  jobListing: JobListing, 
+  setDuration: React.Dispatch<React.SetStateAction<JobListingDuration | undefined>> 
+  setClientSecret: React.Dispatch<React.SetStateAction<string | undefined>> 
+}
+
+const PublishDropDownOptions = ({ jobListing, setDuration, setClientSecret }: PublishDropDownOptionsProps) => {
+
+  // The DropdownMenuTrigger Button is currently a descendant of another button and that is a problem 
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="default"
+          className="data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800"
+        >
+          {
+            { expired: "Republish", active: "Extend", unpublished: "Publish" }[
+              publishedStatus(jobListing.expiresAt)
+            ]
+          }
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center">
+        {JOB_LISTING_DURATIONS.map((duration, i) => (
+          <DropdownMenuItem key={i} onClick={ async ()=> {
+            setDuration(duration)
+            const { clientSecret } = await createListingPublishPaymentIntent(jobListing.id, duration)
+            setClientSecret(clientSecret)
+          }}>
+            <>{duration} Days - ${Math.round(getJobListingPriceInCents(duration)/100)}</>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+
+function jobListingSortFunction (a: JobListing, b: JobListing) {
+  if (a.expiresAt == null && b.expiresAt == null) {
+    return 0
+  }
+  if (a.expiresAt == null) {        // Drafts should show up first
+    return -1
+  }
+  if (b.expiresAt == null) {
+    return 1
+  }
+  return a.expiresAt.getTime() - b.expiresAt.getTime()
+}
