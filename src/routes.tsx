@@ -7,7 +7,7 @@ import { TaskListPage } from "@/pages/tasks/TaskListPage"
 import { Navigate, RouteObject } from "react-router"
 import Private from "./components/routing/PrivatePage"
 import { editListingRoute } from "./pages/listings/edit-listing"
-import JobListings from "./pages/listings/job-listings/JobListings"
+import { publicListingsRoute } from "./pages/listings/job-listings"
 import { MyListingsLoader } from "./pages/listings/my-listings/MyListingsLoader"
 import MyListingsPage from "./pages/listings/my-listings/MyListingsPage"
 import NewListingPage from "./pages/listings/new-listing/NewListingPage"
@@ -40,9 +40,8 @@ export const routes: RouteObject[] = [
           {
             path: "jobs",
             children: [
-              { index: true,
-                element: <JobListings />,
-              },
+              { index: true, ...publicListingsRoute},
+              // The following is an example of not having an 'index' page for a route & loader
               { path: "my-listings",
                 element: <Private><MyListingsPage /></Private>,
                 loader: MyListingsLoader

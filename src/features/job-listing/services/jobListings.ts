@@ -31,6 +31,10 @@ export function getMyListings() {
   return baseApi.get<JobListing[]>(`/job-listings/my-listings`).then(res => z.array(jobListingSchema).parseAsync(res.data)) 
 }
 
+export function getPublishedListings() {
+  return baseApi.get<JobListing[]>(`/job-listings/published`).then(res => z.array(jobListingSchema).parseAsync(res.data)) 
+}
+
 export function getJobListing(id: string) {
   return baseApi.get<JobListing>(`/job-listings/${id}`).then(res => jobListingSchema.parseAsync(res.data)) 
 }

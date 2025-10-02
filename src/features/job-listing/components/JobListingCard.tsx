@@ -26,7 +26,7 @@ type JobListingCardProps = {
 
 const JobListingCard = ({title, companyName, location, salary, type: jobType, experienceLevel, shortDescription, className, headerDetails, footer}: JobListingCardProps) => {
   return (
-    <Card className={cn("h-full flex flex-col",className)}>
+    <Card className={cn("h-full flex flex-col ", className)}>
       <CardHeader>
         <CardTitle className="flex justify-between gap-4">
           {title}

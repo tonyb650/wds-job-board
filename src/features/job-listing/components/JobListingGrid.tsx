@@ -27,7 +27,7 @@ type Props = ComponentProps<'div'>
   That object has lots of properties. We are only going to explicitly use ONE of those properties (classname),
   the rest are just being passed along...
   AHA! This doesn't work in the consuming JSX though! We need to pass children and TS doesn't know about it.
-  That's where ComponentType<'div'> comes in. It covers ALL the props, INCLUDING className
+  That's where ComponentProps<'div'> comes in. It covers ALL the props, INCLUDING className
 */
 const JobListingGrid = ({className, ...props}: Props) => {  //<-- Props == ComponentProps<'div'> from 'react'
 

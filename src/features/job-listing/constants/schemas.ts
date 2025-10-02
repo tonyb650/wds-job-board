@@ -54,6 +54,7 @@ export const jobListingFormSchema = z.object({
   salary: z.number().int().positive(),
   shortDescription: z.string().max(200).nonempty(),
   description: z.string().nonempty(),
+
 })
 
 export type JobListingFormValues = z.infer<typeof jobListingFormSchema>
