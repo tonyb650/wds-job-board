@@ -1,11 +1,11 @@
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { getJobListingPriceInCents } from "@backend/utils/getJobListingPriceInCents";
 import { Elements } from "@stripe/react-stripe-js";
 import { Appearance } from "@stripe/stripe-js";
 import { JobListingDuration } from "../constants/schemas";
 import { stripePromise } from "../helpers/stripe";
 import StripePaymentElement from "./StripePaymentElement";
 import useTheme from "@/hooks/useTheme";
+import { getJobListingPriceInCents } from "../helpers/getJobListingPriceInCents";
 
 
 type StripeFormProps = {
