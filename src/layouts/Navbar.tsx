@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -10,6 +11,7 @@ import {
   DropdownMenuTrigger
 
 } from "@/components/ui/dropdown-menu"
+import { env } from "@/constants/config"
 import { THEME_OPTIONS } from "@/constants/constants"
 import useAuth from "@/features/authentication/hooks/useAuth"
 import useTheme from "@/hooks/useTheme"
@@ -24,8 +26,10 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-10 flex items-center justify-between border-b p-4 bg-white dark:bg-slate-950">
       <div className="container flex justify-between items-center gap-4">
-
-        <span className="text-xl">WDS App</span>
+        <div className="flex flex-col md:block md:space-x-3 ">
+          <span className="text-xl">WDS Job Board</span>
+          { env.VITE_ENVIRONMENT === "production" && <Badge variant={"destructive"} className="text-center">DB may be slow when left idle</Badge>}
+        </div>
 
         <div className="flex">
           <ThemeToggleButton/>

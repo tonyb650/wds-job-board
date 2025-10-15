@@ -6,6 +6,7 @@ export const env = createEnv({
   client: {
     VITE_API_URL: z.string().url(),
     VITE_TEST_SLOW_API: z.coerce.boolean().default(false), // <-- env variables are always strings so we must convert to boolean.
+    VITE_ENVIRONMENT: z.string().default("development"),
     VITE_STRIPE_PUBLISHABLE_KEY: z.string(),
   },
   isServer: false,

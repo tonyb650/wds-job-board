@@ -4,15 +4,15 @@
 <br />
 <div align="center">
   <a href="https://courses.webdevsimplified.com/">
-    <img src="https://courses.webdevsimplified.com/content-assets/public/eyJhbGciOiJIUzI1NiJ9.eyJvYmplY3Rfa2V5IjoiY2IxbHg1eHJ4YXNvMnlocGl3cjg3cnUyamlteCIsImRvbWFpbiI6ImNvdXJzZXMud2ViZGV2c2ltcGxpZmllZC5jb20ifQ.sih852orbsVSqbH_Ks85JUnpFSN_KbXaS39KKMM_WhM" alt="Logo" width="80" height="80">
+    <img src="https://courses.webdevsimplified.com/content-assets/public/eyJhbGciOiJIUzI1NiJ9.eyJvYmplY3Rfa2V5IjoiY2IxbHg1eHJ4YXNvMnlocGl3cjg3cnUyamlteCIsImRvbWFpbiI6ImNvdXJzZXMud2ViZGV2c2ltcGxpZmllZC5jb20ifQ.sih852orbsVSqbH_Ks85JUnpFSN_KbXaS39KKMM_WhM" alt="Logo" width="80" >
   </a>
 
   <h3 align="center">React Simplified - Bonus Project </h3>
 
   <p align="center">
-    A front-end React project that serves a capstone for WDS "React Simplified" course. 
-    <br />
-    [Deployed project:](https://wds-job-board-client.onrender.com)
+  A front-end React project that serves a capstone for WDS "React Simplified" course. 
+
+  [Go to deployed project](https://wds-job-board-client.onrender.com)
   </p>
 </div>
 
@@ -143,7 +143,7 @@ Tony Brierly
 
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-Deployed project: [https://wds-job-board-client.onrender.com](https://wds-job-board-client.onrender.com)
+Deployed project: [Here](https://wds-job-board-client.onrender.com)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
