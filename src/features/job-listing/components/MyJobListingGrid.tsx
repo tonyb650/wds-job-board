@@ -20,7 +20,6 @@ import {
 } from "@radix-ui/react-alert-dialog";
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { getJobListingPriceInCents } from "../../../../../api/src/utils/getJobListingPriceInCents";
 import { JOB_LISTING_DURATIONS, JobListingDuration } from "../constants/schemas";
 import { JobListing } from "../constants/types";
 import publishedStatus from "../helpers/publishedStatus";
@@ -30,6 +29,7 @@ import JobListingGrid from "./JobListingGrid";
 import PublicationStatusBadge from "./PublicationStatusBadge";
 import StripeForm from "./StripeForm";
 import jobListingSortFunction from "../helpers/jobListingSortFunction";
+import { getJobListingPriceInCents } from "../helpers/getJobListingPriceInCents";
 
 
 type Props = {
