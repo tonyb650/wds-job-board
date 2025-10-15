@@ -61,6 +61,7 @@ const SignupForm = () => {
     }
   }
   
+  console.log(form.formState.isValid)
   
   return (
     <Form {...form}>
@@ -132,7 +133,7 @@ const SignupForm = () => {
                 Login
               </Link>
             </Button>
-            <Button type="submit" variant="secondary" disabled={!form.formState.isValid || form.formState.isSubmitting }>
+            <Button type="submit" variant="secondary" disabled={ form.formState.isSubmitting }>
               {form.formState.isSubmitting ? <LoadingSpinner/> : "Sign Up"}
             </Button>
           </CardFooter>
