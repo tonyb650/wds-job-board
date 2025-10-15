@@ -15,7 +15,7 @@ export const baseApi: AxiosInstance = axios.create({
 
 console.log(env.VITE_TEST_SLOW_API)
 
-if (env.VITE_TEST_SLOW_API) {
+if (env.VITE_ENVIRONMENT === "development") {
   console.log("Slowing")
   baseApi.interceptors.request.use((req) => {
     return new Promise((resolve) => {
