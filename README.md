@@ -10,8 +10,9 @@
   <h3 align="center">React Simplified - Bonus Project </h3>
 
   <p align="center">
-    A front-end React project that serves a capstone for WDS "React Simplified" course.
+    A front-end React project that serves a capstone for WDS "React Simplified" course. 
     <br />
+    [Deployed project:](https://wds-job-board-client.onrender.com)
   </p>
 </div>
 
@@ -142,7 +143,7 @@ Tony Brierly
 
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-Deployed project: [tbd.com](https://tbd.com)
+Deployed project: [https://wds-job-board-client.onrender.com](https://wds-job-board-client.onrender.com)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
