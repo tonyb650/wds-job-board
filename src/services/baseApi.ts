@@ -13,15 +13,13 @@ export const baseApi: AxiosInstance = axios.create({
   Promise that calls the resolve method after a 1000ms delay
 */
 
-console.log(env)
-
-if (env.VITE_TEST_SLOW_API === false) {
+if (env.VITE_TEST_SLOW_API) {
   console.log("Slowing")
   baseApi.interceptors.request.use((req) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(req)
-      }, 500)              
+      }, 1000)              
     })
   })
 }
